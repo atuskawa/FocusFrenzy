@@ -1,44 +1,35 @@
 package com.example.focusfrenzy
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
-import com.example.focusfrenzy.databinding.FragmentFirstBinding
+import android.widget.Button
+import android.widget.DatePicker
+import android.widget.TimePicker
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
-class SetDateAndTimeActivity : Fragment() {
+class SetDateAndTimeActivity : AppCompatActivity() {
 
-    private var _binding: FragmentFirstBinding? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_set_date_and_time)
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+        val datePicker = findViewById<DatePicker>(R.id.datePicker)
+        val timePicker = findViewById<TimePicker>(R.id.timePicker)
+        val btnSetDateTime = findViewById<Button>(R.id.btnSetDateTime)
+        timePicker.setIs24HourView(true)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        btnSetDateTime.setOnClickListener {
+            val day = datePicker.dayOfMonth
+            val month = datePicker.month + 1 // Months are 0-based
+            val year = datePicker.year
 
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        return binding.root
+            val hour = timePicker.hour
+            val minute = timePicker.minute
 
-    }
+            val selectedDateTime = "$year-$month-$day $hour:$minute"
+            Toast.makeText(this, "Selected: $selectedDateTime", Toast.LENGTH_LONG).show()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            // TODO: You can save or use the date/time here
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

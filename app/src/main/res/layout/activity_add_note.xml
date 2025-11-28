@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_width="match_parent"
@@ -15,7 +16,9 @@
         android:text="Add a Note"
         android:textColor="#3E2723"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="HardcodedText"/>
+
 
     <EditText
         android:id="@+id/etNoteContent"
@@ -28,7 +31,8 @@
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:gravity="top"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        tools:ignore="HardcodedText"/>
 
     <Button
         android:id="@+id/btnSaveNote"
@@ -37,6 +41,6 @@
         android:text="Save"
         android:layout_marginTop="24dp"
         android:backgroundTint="#95C6A9"
-        android:textColor="#000000" />
-
+        android:textColor="#000000"
+        tools:ignore="HardcodedText"/>
 </LinearLayout>

@@ -26,5 +26,4 @@
         android:backgroundTint="#95C6A9"
         android:text="+ Add an Activity"
         tools:ignore="HardcodedText" />
-
 </LinearLayout>
