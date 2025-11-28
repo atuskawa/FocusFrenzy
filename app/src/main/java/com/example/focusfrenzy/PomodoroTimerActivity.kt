@@ -1,5 +1,6 @@
 package com.example.focusfrenzy
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.focusfrenzy.databinding.ActivityPomodoroTimerBinding
@@ -32,8 +33,9 @@ class PomodoroTimerActivity : AppCompatActivity() {
                 updateTimerText()
             }
 
+            @SuppressLint("SetTextI18n") //shut up line 38!
             override fun onFinish() {
-                binding.tvTimer.text = "Done!"
+                binding.tvTimer.text = "Finished!"
             }
         }.start()
     }
@@ -44,6 +46,7 @@ class PomodoroTimerActivity : AppCompatActivity() {
         updateTimerText()
     }
 
+    @SuppressLint("DefaultLocale") //shut up line 52!
     private fun updateTimerText() {
         val minutes = (timeLeftInMillis / 1000) / 60
         val seconds = (timeLeftInMillis / 1000) % 60

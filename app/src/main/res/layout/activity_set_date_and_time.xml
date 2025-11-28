@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="#95C6A9">
+    android:background="#B3E4C7">
 
-    <DatePicker
-        android:id="@+id/datePicker"
+    <FrameLayout
         android:layout_width="328dp"
         android:layout_height="405dp"
-        android:calendarViewShown="true" />
+        android:background="@drawable/curved_container"
+        android:clipToOutline="true"
+        android:padding="12dp"
+        tools:targetApi="31">
 
+        <DatePicker
+            android:id="@+id/datePicker"
+            android:layout_width="328dp"
+            android:layout_height="405dp"
+            android:calendarViewShown="true" />
+
+    </FrameLayout>
 
     <TimePicker
         android:id="@+id/timePicker"
@@ -26,8 +36,10 @@
         android:id="@+id/btnSetDateTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Date And Time"
         android:layout_marginTop="48dp"
-        tools:ignore="HardcodedText" />
+        android:backgroundTint="#95C6A9"
+        android:minHeight="48dp"
+        android:text="Set Date And Time"
+        tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
 </LinearLayout>
