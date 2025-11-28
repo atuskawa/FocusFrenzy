@@ -20,7 +20,7 @@ class SetDateAndTimeActivity : AppCompatActivity() {
 
         btnSetDateTime.setOnClickListener {
             val day = datePicker.dayOfMonth
-            val month = datePicker.month + 1 // Months are 0-based
+            val month = datePicker.month + 1 // Months = 0 Based Always (heh based)
             val year = datePicker.year
 
             val hour = timePicker.hour
