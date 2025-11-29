@@ -21,10 +21,11 @@
             </intent-filter>
         </activity>
 
-        <!-- Each activity is declared in manifest para ma-detect wahoo (Line 25-27)  -->
-        <activity android:name=".AddNoteActivity"/>
-        <activity android:name=".PomodoroTimerActivity"/>
-        <activity android:name=".SetDateAndTimeActivity"/>
+        <activity android:name=".SetDateAndTimeActivity" android:exported="true"/>
+        <activity android:name=".AddNoteActivity" android:exported="true"/>
+        <activity android:name=".PomodoroTimerActivity" android:exported="true"/>
+
+
 
     </application>
 </manifest>

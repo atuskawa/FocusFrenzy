@@ -15,7 +15,7 @@ class AddReminderActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnAddActivity.setOnClickListener {
-            val intent = Intent(this, PomodoroTimerActivity::class.java)
+            val intent = Intent(this, SetDateAndTimeActivity::class.java)
             startActivity(intent)
         }
     }

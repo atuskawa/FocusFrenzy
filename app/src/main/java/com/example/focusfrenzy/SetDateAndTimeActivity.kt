@@ -5,6 +5,7 @@ import android.widget.Button
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 
 class SetDateAndTimeActivity : AppCompatActivity() {
@@ -18,6 +19,8 @@ class SetDateAndTimeActivity : AppCompatActivity() {
         val btnSetDateTime = findViewById<Button>(R.id.btnSetDateTime)
         timePicker.setIs24HourView(true)
 
+        val reminder = intent.getStringExtra("reminder")
+
         btnSetDateTime.setOnClickListener {
             val day = datePicker.dayOfMonth
             val month = datePicker.month + 1 // Months = 0 Based Always (heh based)
@@ -29,7 +32,11 @@ class SetDateAndTimeActivity : AppCompatActivity() {
             val selectedDateTime = "$year-$month-$day $hour:$minute"
             Toast.makeText(this, "Selected: $selectedDateTime", Toast.LENGTH_LONG).show()
 
-            // TODO: You can save or use the date/time here
+            val intent = Intent(this, AddNoteActivity::class.java)
+            intent.putExtra("reminder", reminder)
+            intent.putExtra("dateTime", selectedDateTime)
+            startActivity(intent)
+            finish() // Optional: Finish the current activity")
         }
     }
 }
