@@ -1,0 +1,11 @@
+CHECKPOINT 1 PROGRESS (11/29/25)
+- AddReminder → SetDateAndTime → AddNote flow implemented
+- XML of each screen are developed
+- Screen flow is correct
+
+
+mga kulang natin:
+-need mag-appear yung reminder sa AddReminderActivity
+-app DB para dun magsave yung mga active reminders
+-App Logo (optional, di panaman need)
+-app settings siguro
