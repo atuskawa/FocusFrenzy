@@ -23,23 +23,47 @@
         android:textColor="#FFFFFF"
         tools:ignore="HardcodedText"/>
 
-    <!-- Start button -->
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="120dp"
+    //Start and Reset Buttons are now side by side
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#95C6A9"
-        android:text="Start"
-        tools:ignore="HardcodedText" />
-
-    <!-- Reset button -->
-    <Button
-        android:id="@+id/btnReset"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="16dp"
-        android:backgroundTint="#95C6A9"
-        android:text="Reset"
-        tools:ignore="HardcodedText" />
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#95C6A9"
+            android:text="Start"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:backgroundTint="#95C6A9"
+            android:text="Reset"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+
+    //Shows the reminder under the buttons
+    <TextView
+        android:id="@+id/tvReminder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:padding="12dp"
+        android:background="#95C6A9"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:text="Your reminder will appear here"
+        android:gravity="center"
+        tools:ignore="HardcodedText"/>
+
+    //figure out how it updates for each reminder
 
 </LinearLayout>
