@@ -7,15 +7,10 @@ import com.example.focusfrenzy.databinding.ActivityPomodoroTimerBinding
 import android.os.CountDownTimer
 
 class PomodoroTimerActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityPomodoroTimerBinding
-
-    // Timer stuff
     private var timer: CountDownTimer? = null
-
-    // milliseconds
-    private var timeLeftInMillis: Long = 25 * 60 * 1000 // 25 min
-
-    // Flag to track if the timer is running
+    private var timeLeftInMillis: Long = 25 * 60 * 1000
     private var timerRunning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,55 +18,65 @@ class PomodoroTimerActivity : AppCompatActivity() {
         binding = ActivityPomodoroTimerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Display the reminder at the container
+        val dateTime = intent.getStringExtra("datetime") ?: ""
+        val note = intent.getStringExtra("note") ?: ""
+
+        val reminderText = buildString {
+            append(title)
+            if (dateTime.isNotEmpty()) append("\n$dateTime")
+            if (note.isNotEmpty()) append("\n$note")
+        }
+
+        binding.tvReminder.text = reminderText
+
         // Initialize the timer display
         updateTimerText()
         binding.btnStart.text = "Start"
         binding.btnStart.setOnClickListener {
             if (timerRunning) {
-                pauseTimer() //this shows pause if the timer is running
+                pauseTimer()
             } else {
-                startTimer() //this shows start if the timer is not running
+                startTimer()
                 binding.btnStart.text = "Stop"
             }
         }
 
-        // Reset button
         binding.btnReset.setOnClickListener {
-            resetTimer() // Stops timer, resets time, leaves button as "Start"
+            resetTimer()
         }
     }
 
     private fun startTimer() {
-        // Create a new CountDownTimer with the remaining time
         timer = object : CountDownTimer(timeLeftInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                timeLeftInMillis = millisUntilFinished // Update remaining time
-                updateTimerText() // Refresh the UI
+                timeLeftInMillis = millisUntilFinished
+                updateTimerText()
             }
 
             override fun onFinish() {
-                timerRunning = false // Timer finished, mark as not running
-                binding.btnStart.text = "Start" // Reset button text
-                binding.tvTimer.text = "Finished!" // Show finished text
+                timerRunning = false
+                binding.btnStart.text = "Start"
+                binding.tvTimer.text = "Finished!"
             }
         }.start()
 
-        timerRunning = true // Mark timer as running
-        binding.btnStart.text = "Stop" // Update button text to reflect stop action
+        timerRunning = true
+        binding.btnStart.text = "Stop"
     }
 
     private fun pauseTimer() {
-        timer?.cancel() // Stop the timer
-        timerRunning = false // Mark timer as not running
-        binding.btnStart.text = "Start" // Button goes back to "Start"
+        timer?.cancel()
+        timerRunning = false
+        binding.btnStart.text = "Start"
     }
 
     private fun resetTimer() {
-        timer?.cancel() // Stop the timer if running
-        timerRunning = false // Make sure timer is marked as not running
-        timeLeftInMillis = 25 * 60 * 1000 // Reset timer to full 25 minutes
-        updateTimerText() // Update the UI
-        binding.btnStart.text = "Start" // Ensure button text shows "Start"
+        timer?.cancel()
+        timerRunning = false
+        timeLeftInMillis = 25 * 60 * 1000
+        updateTimerText()
+        binding.btnStart.text = "Start"
     }
 
     @SuppressLint("DefaultLocale")

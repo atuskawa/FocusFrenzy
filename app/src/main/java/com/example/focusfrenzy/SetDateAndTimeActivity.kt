@@ -1,13 +1,13 @@
 package com.example.focusfrenzy
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.DatePicker
 import android.widget.TimePicker
-import android.widget.Toast
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 
+@Suppress("DEPRECATION")
 class SetDateAndTimeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,27 +16,28 @@ class SetDateAndTimeActivity : AppCompatActivity() {
 
         val datePicker = findViewById<DatePicker>(R.id.datePicker)
         val timePicker = findViewById<TimePicker>(R.id.timePicker)
-        val btnSetDateTime = findViewById<Button>(R.id.btnSetDateTime)
+        val btnNext = findViewById<Button>(R.id.btnSetDateTime)
         timePicker.setIs24HourView(true)
 
-        val reminder = intent.getStringExtra("reminder")
-
-        btnSetDateTime.setOnClickListener {
+        btnNext.setOnClickListener {
             val day = datePicker.dayOfMonth
-            val month = datePicker.month + 1 // Months = 0 Based Always (heh based)
+            val month = datePicker.month + 1
             val year = datePicker.year
-
             val hour = timePicker.hour
             val minute = timePicker.minute
-
             val selectedDateTime = "$year-$month-$day $hour:$minute"
-            Toast.makeText(this, "Selected: $selectedDateTime", Toast.LENGTH_LONG).show()
 
             val intent = Intent(this, AddNoteActivity::class.java)
-            intent.putExtra("reminder", reminder)
-            intent.putExtra("dateTime", selectedDateTime)
-            startActivity(intent)
-            finish() // Optional: Finish the current activity")
+            intent.putExtra("datetime", selectedDateTime)
+            startActivityForResult(intent, 100)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            setResult(RESULT_OK, data)
+            finish()
         }
     }
 }

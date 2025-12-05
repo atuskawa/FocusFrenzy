@@ -64,6 +64,4 @@
         android:gravity="center"
         tools:ignore="HardcodedText"/>
 
-    //figure out how it updates for each reminder
-
 </LinearLayout>
