@@ -4,8 +4,23 @@ CHECKPOINT 1 PROGRESS (11/29/25)
 - Screen flow is correct
 
 
-mga kulang natin:
+Pending:
 -need mag-appear yung reminder sa AddReminderActivity
 -app DB para dun magsave yung mga active reminders
 -App Logo (optional, di panaman needed, kahit mga before finals nalang)
 -app settings siguro
+
+---------------------------------------------------------------------------
+
+CHECKPOINT 2 PROGRESS (12/05/25)
+- Checkbox for Pomodoro Timer is now working
+- Reminders now show up in the MainScreen
+- Planning on implementing a "secret surprise" soon :P
+
+Pending:
+- Settings Menu
+- Persist ng Reminders
+- Ayusin yung Format ng Reminders sa MainScreen
+
+Bugs:
+- When you close (destroy) the app, all the reminders are deleted 
