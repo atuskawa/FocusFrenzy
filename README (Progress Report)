@@ -24,3 +24,20 @@ Pending:
 
 Bugs:
 - When you close (destroy) the app, all the reminders are deleted 
+
+
+CHECKPOINT 3 PROGRESS (12/11/25)
+- Added text on home screen that says no reminders when there's no reminders
+- Pomodoro Timer now shows red when timer is active, and green when inactive or paused
+- Pressing the timer in the pomodoro screen now allows users to change the duration of the timer
+- Time Limit for Pomodoro is 60 Minutes
+
+bugs:
+- Timer color box doesnt change to red when active
+- No sound is played once timer is finished
+
+Pending:
+- Settings Menu
+- Persist ng Reminders
+- Alarm Audio when timer is finished
+- Further Improve Reminder Format
