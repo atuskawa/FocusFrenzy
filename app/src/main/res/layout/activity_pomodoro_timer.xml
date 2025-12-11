@@ -21,7 +21,10 @@
         android:padding="16dp"
         android:background="@drawable/timer_border"
         android:textColor="#FFFFFF"
+        android:clickable="true"
+        android:focusable="true"
         tools:ignore="HardcodedText"/>
+
 
     //Start and Reset Buttons are now side by side
     <LinearLayout

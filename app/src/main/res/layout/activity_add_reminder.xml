@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Container for reminders -->
+    <!-- This holds the reminders that are added -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
@@ -35,18 +35,37 @@
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         tools:ignore="SpeakableTextPresentCheck">
 
-        <LinearLayout
-            android:id="@+id/reminderContainer"
+        <!-- Text formatting for TextView -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:layout_height="wrap_content">
+
+            <!-- The box yells out "No Reminders Added"-->
+            <TextView
+                android:id="@+id/tvNoReminders"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="No reminders added"
+                android:textColor="#5D4037"
+                android:textSize="18sp"
+                android:gravity="center"
+                tools:ignore="HardcodedText" />
+
+            <!-- The list itself -->
+            <LinearLayout
+                android:id="@+id/reminderContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </FrameLayout>
     </ScrollView>
 
     <!-- Add Activity button -->
     <Button
         android:id="@+id/btnAddActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="274dp"
+        android:layout_height="54dp"
         android:backgroundTint="#95C6A9"
         android:text="+ Add an Activity"
         android:textColor="#5D4037"
