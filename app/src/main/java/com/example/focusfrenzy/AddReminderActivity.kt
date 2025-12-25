@@ -89,7 +89,7 @@ class AddReminderActivity : AppCompatActivity() {
                     true
                 }
 
-                // Shift title on first reminder
+                // This shifts the title when there's no reminder added and you add one
                 if (!firstReminderAdded) {
                     firstReminderAdded = true
                     val params = binding.tvTitle.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
