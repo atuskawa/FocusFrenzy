@@ -41,3 +41,18 @@ Pending:
 - Persist ng Reminders
 - Alarm Audio when timer is finished
 - Further Improve Reminder Format
+
+CHECKPOINT 4 PROGRESS (01/09/26)
+-Developed the SQLiteManager database
+
+bugs:
+- Timer color box doesnt change to red when active
+- No sound is played once timer is finished
+-Timer resets when you leave the timer screen
+
+Pending:
+- Settings Menu
+- Calling SQLiteManager from other Activities to complete persistence
+- Alarm Audio when timer is finished
+- Further Improve Reminder Format
+
