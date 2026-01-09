@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    //error above, dunno what the fuck that is about :P
+    <!-- error above, dunno what the fuck that is about :P -->
 
     <application
         android:allowBackup="true"
