@@ -8,127 +8,114 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.focusfrenzy.databinding.ActivityAddReminderBinding
 
 class AddReminderActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityAddReminderBinding
-    private lateinit var reminderContainer: LinearLayout
     private lateinit var db: SQLiteManager
 
-    // Launcher for SetDateAndTimeActivity
-    private val reminderLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val dateTime = result.data?.getStringExtra("datetime") ?: return@registerForActivityResult
-                val note = result.data?.getStringExtra("note") ?: ""
-                val usePomodoro = result.data?.getBooleanExtra("usePomodoro", false) ?: false
 
-                // Insert only if this exact reminder does not exist (DB-level uniqueness check)
-                if (!db.reminderExists(note, dateTime)) {
-                    db.addReminder(note, dateTime, usePomodoro)
-                }
+    private val reminderLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data ?: return@registerForActivityResult
+            val id = data.getIntExtra("id", -1)
+            val dateTime = data.getStringExtra("datetime") ?: ""
+            val note = data.getStringExtra("note") ?: ""
+            val usePomodoro = data.getBooleanExtra("usePomodoro", false)
 
-                // Rebuild UI from DB
-                loadRemindersFromDB()
+            if (id == -1) {
+                val newId = db.addReminder(note, dateTime, usePomodoro).toInt()
+                addReminderToUI(newId, note, dateTime, usePomodoro)
+            } else {
+                db.updateReminder(id, note, dateTime, usePomodoro)
+                addReminderToUI(id, note, dateTime, usePomodoro)
             }
+            updateEmptyState()
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddReminderBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         db = SQLiteManager.getInstance(this)
-        reminderContainer = findViewById(R.id.reminderContainer)
 
-        binding.btnAddActivity.setOnClickListener {
-            val intent = Intent(this, SetDateAndTimeActivity::class.java)
-            reminderLauncher.launch(intent)
+        binding.btnSearch.setOnClickListener {
+            startActivity(Intent(this, SearchForReminderActivity::class.java))
         }
 
-        // Load reminders initially
-        loadRemindersFromDB()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Rebuild UI every time to prevent duplication
+        binding.btnAddActivity.setOnClickListener {
+            reminderLauncher.launch(Intent(this, SetDateAndTimeActivity::class.java))
+        }
         loadRemindersFromDB()
     }
 
     private fun loadRemindersFromDB() {
-        reminderContainer.removeAllViews() // Clear old views
-
+        binding.reminderContainer.removeAllViews()
         val cursor = db.getAllReminders()
         if (cursor.moveToFirst()) {
             do {
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
-                val title = cursor.getString(cursor.getColumnIndexOrThrow("title"))
+                val note = cursor.getString(cursor.getColumnIndexOrThrow("title"))
                 val date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
-                val usePomodoro = cursor.getInt(cursor.getColumnIndexOrThrow("usePomodoro")) == 1
-
-                addReminderToUI(id, title, date, usePomodoro)
+                val pom = cursor.getInt(cursor.getColumnIndexOrThrow("usePomodoro")) == 1
+                addReminderToUI(id, note, date, pom)
             } while (cursor.moveToNext())
         }
         cursor.close()
-
-        binding.tvNoReminders.visibility = if (reminderContainer.childCount == 0) View.VISIBLE else View.GONE
-
+        updateEmptyState()
     }
 
     private fun addReminderToUI(id: Int, note: String, dateTime: String, usePomodoro: Boolean) {
-        // Prevent duplicate UI for same DB ID
-        if (reminderContainer.findViewWithTag<LinearLayout>(id) != null) return
+        val existing = binding.reminderContainer.findViewWithTag<LinearLayout>(id)
+        if (existing != null) {
+            (existing.getChildAt(0) as TextView).text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
+            return
+        }
 
-        val reminderLayout = LinearLayout(this).apply {
+        val layout = LinearLayout(this).apply {
+            tag = id
             orientation = LinearLayout.VERTICAL
             setPadding(24, 24, 24, 24)
             setBackgroundResource(R.drawable.reminder_background)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(0, 16, 0, 16) }
-            tag = id
+            setOnClickListener {
+                if (usePomodoro) {
+                    val intent = Intent(this@AddReminderActivity, PomodoroTimerActivity::class.java)
+                    intent.putExtra("reminderId", id)
+                    intent.putExtra("note", note)
+                    intent.putExtra("datetime", dateTime)
+                    startActivity(intent)
+                }
+            }
+            setOnLongClickListener {
+                AlertDialog.Builder(this@AddReminderActivity).setItems(arrayOf("Edit", "Delete")) { _, which ->
+                    if (which == 0) {
+                        val intent = Intent(this@AddReminderActivity, SetDateAndTimeActivity::class.java)
+                        intent.putExtra("id", id)
+                        intent.putExtra("note", note)
+                        intent.putExtra("datetime", dateTime)
+                        intent.putExtra("usePomodoro", usePomodoro)
+                        reminderLauncher.launch(intent)
+                    } else {
+                        db.deleteReminder(id)
+                        binding.reminderContainer.removeView(this)
+                        updateEmptyState()
+                    }
+                }.show()
+                true
+            }
         }
 
-        val reminderView = TextView(this).apply {
-            text = buildString {
-                append(" $dateTime")
-                if (note.isNotEmpty()) append("\n$note")
-                if (usePomodoro) append(" 🕛")
-            }
+        val tv = TextView(this).apply {
+            text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
             textSize = 16f
             setTextColor(resources.getColor(R.color.black))
         }
+        layout.addView(tv)
+        binding.reminderContainer.addView(layout, 0)
+    }
 
-        reminderLayout.addView(reminderView)
-        reminderContainer.addView(reminderLayout, 0)
-
-        // Pomodoro click
-        if (usePomodoro) {
-            reminderLayout.setOnClickListener {
-                val intent = Intent(this, PomodoroTimerActivity::class.java)
-                intent.putExtra("datetime", dateTime)
-                intent.putExtra("note", note)
-                startActivity(intent)
-            }
-        }
-
-        // Long press delete
-        reminderLayout.setOnLongClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Delete this Reminder")
-                .setMessage("Do you want to delete this reminder?")
-                .setPositiveButton("Yes") { dialog, _ ->
-                    db.deleteReminder(id)
-                    loadRemindersFromDB() // rebuild UI after deletion
-                    dialog.dismiss()
-                }
-                .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
-                .show()
-            true
-        }
+    private fun updateEmptyState() {
+        binding.tvNoReminders.visibility = if (binding.reminderContainer.childCount == 0) View.VISIBLE else View.GONE
     }
 }

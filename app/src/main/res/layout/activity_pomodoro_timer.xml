@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pomodoroRoot"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_width="match_parent"
@@ -9,29 +9,35 @@
     android:padding="24dp"
     android:background="#B3E4C7">
 
-    <!-- Timer display -->
+    <TextView
+        android:id="@+id/tvSessionType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Focusing..."
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="8dp"
+        tools:ignore="HardcodedText"/>
+
     <TextView
         android:id="@+id/tvTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="25:00"
-        android:textSize="48sp"
+        android:textSize="64sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp"
         android:padding="16dp"
-        android:background="@drawable/timer_border"
         android:textColor="#FFFFFF"
         android:clickable="true"
         android:focusable="true"
         tools:ignore="HardcodedText"/>
 
-
-    //Start and Reset Buttons are now side by side
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp"
         android:gravity="center">
 
         <Button
@@ -48,21 +54,20 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:backgroundTint="#95C6A9"
-            android:text="Reset"
+            android:text="Break"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>
 
-    //Shows the reminder under the buttons
     <TextView
         android:id="@+id/tvReminder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:padding="12dp"
+        android:layout_marginTop="32dp"
+        android:padding="16dp"
         android:background="#95C6A9"
         android:textColor="#000000"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:text="Your reminder will appear here"
         android:gravity="center"
         tools:ignore="HardcodedText"/>

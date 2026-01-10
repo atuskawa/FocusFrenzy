@@ -7,36 +7,31 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.focusfrenzy.databinding.ActivityAddNoteBinding
 
 class AddNoteActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityAddNoteBinding
-    private lateinit var db: SQLiteManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddNoteBinding.inflate(layoutInflater)
+        val binding = ActivityAddNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        db = SQLiteManager.getInstance(this)
+        val id = intent.getIntExtra("id", -1)
+        val dt = intent.getStringExtra("datetime") ?: ""
 
-        // Only get datetime from intent; no title
-        val dateTime = intent.getStringExtra("datetime") ?: ""
+        // Pre-fill if editing
+        binding.etNoteContent.setText(intent.getStringExtra("note") ?: "")
+        binding.cbImportant.isChecked = intent.getBooleanExtra("usePomodoro", false)
 
         binding.btnSaveNote.setOnClickListener {
             val note = binding.etNoteContent.text.toString().trim()
-            val usePomodoro = binding.cbImportant.isChecked
-
             if (note.isEmpty()) {
-                Toast.makeText(this, "Please type a note!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Type something!", Toast.LENGTH_SHORT).show()
             } else {
-                db.addReminder(note, dateTime, usePomodoro)
-                // Return data back to SetDateAndTimeActivity
-                val resultIntent = Intent()
-                resultIntent.putExtra("datetime", dateTime)
-                resultIntent.putExtra("note", note)
-                resultIntent.putExtra("usePomodoro", usePomodoro)
-
-                setResult(RESULT_OK, resultIntent)
-                finish() // closes AddNoteActivity
+                val res = Intent().apply {
+                    putExtra("id", id)
+                    putExtra("datetime", dt)
+                    putExtra("note", note)
+                    putExtra("usePomodoro", binding.cbImportant.isChecked)
+                }
+                setResult(RESULT_OK, res)
+                finish()
             }
         }
     }

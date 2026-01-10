@@ -7,35 +7,32 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 
-@Suppress("DEPRECATION")
 class SetDateAndTimeActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_date_and_time)
 
-        val datePicker = findViewById<DatePicker>(R.id.datePicker)
-        val timePicker = findViewById<TimePicker>(R.id.timePicker)
-        val btnNext = findViewById<Button>(R.id.btnSetDateTime)
-        timePicker.setIs24HourView(true)
+        val reminderId = intent.getIntExtra("id", -1) // KEEPING THE ID ALIVE
 
-        btnNext.setOnClickListener {
-            val day = datePicker.dayOfMonth
-            val month = datePicker.month + 1
-            val year = datePicker.year
-            val hour = timePicker.hour
-            val minute = timePicker.minute
-            val selectedDateTime = "$year-$month-$day $hour:$minute"
+        findViewById<Button>(R.id.btnSetDateTime).setOnClickListener {
+            val date = findViewById<DatePicker>(R.id.datePicker)
+            val time = findViewById<TimePicker>(R.id.timePicker)
+            val dt = "${date.year}-${date.month + 1}-${date.dayOfMonth} ${time.hour}:${time.minute}"
 
-            val intent = Intent(this, AddNoteActivity::class.java)
-            intent.putExtra("datetime", selectedDateTime)
+            val intent = Intent(this, AddNoteActivity::class.java).apply {
+                putExtra("id", reminderId)
+                putExtra("datetime", dt)
+                // Also pass existing data if editing
+                putExtra("note", intent.getStringExtra("note"))
+                putExtra("usePomodoro", intent.getBooleanExtra("usePomodoro", false))
+            }
             startActivityForResult(intent, 100)
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == RESULT_OK) {
+    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
+        super.onActivityResult(req, res, data)
+        if (res == RESULT_OK) {
             setResult(RESULT_OK, data)
             finish()
         }
