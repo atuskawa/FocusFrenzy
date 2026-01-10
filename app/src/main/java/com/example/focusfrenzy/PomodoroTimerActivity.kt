@@ -12,10 +12,12 @@ import android.os.CountDownTimer
 class PomodoroTimerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPomodoroTimerBinding
+    private lateinit var db: SQLiteManager
     private var timer: CountDownTimer? = null
     private var customDurationInMillis: Long = 25 * 60 * 1000
     private var timeLeftInMillis: Long = customDurationInMillis
     private var timerRunning = false
+    private var reminderId: Int = -1 // the DB ID of the reminder
 
     // Colors
     private val sageGreen = "#B3E4C7"
@@ -25,19 +27,22 @@ class PomodoroTimerActivity : AppCompatActivity() {
     private val textOriginal = "#FFFFFF"
     private val reminderOriginal = "#95C6A9"
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPomodoroTimerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Display the reminder
+        db = SQLiteManager.getInstance(this)
+
+        // Grab reminder info from Intent
         val dateTime = intent.getStringExtra("datetime") ?: ""
         val note = intent.getStringExtra("note") ?: ""
+        reminderId = intent.getIntExtra("reminderId", -1) // new: pass DB ID
 
         val reminderText = buildString {
-            append(title)
-            if (dateTime.isNotEmpty()) append("\n$dateTime")
-            if (note.isNotEmpty()) append("\n$note")
+            if (dateTime.isNotEmpty()) append("$dateTime\n")
+            if (note.isNotEmpty()) append(note)
         }
         binding.tvReminder.text = reminderText
 
@@ -48,10 +53,9 @@ class PomodoroTimerActivity : AppCompatActivity() {
             if (timerRunning) pauseTimer() else startTimer()
         }
 
-        //Resets the Timer to selected time
         binding.btnReset.setOnClickListener { resetTimer() }
 
-        //the shit that makes the timer go red and green
+        // Change timer duration manually
         binding.tvTimer.setOnClickListener {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Set timer (minutes)")
@@ -78,9 +82,9 @@ class PomodoroTimerActivity : AppCompatActivity() {
             builder.show()
         }
     }
-//----------------------------------------------------------------------------------------------------------------------------------
+
+    @SuppressLint("UseKtx")
     private fun startTimer() {
-        // Change colors of root, buttons, timer, reminder when active and idle
         binding.root.setBackgroundColor(android.graphics.Color.parseColor(dustyRed))
         binding.btnStart.setBackgroundColor(android.graphics.Color.parseColor(darkRed))
         binding.btnReset.setBackgroundColor(android.graphics.Color.parseColor(darkRed))
@@ -93,10 +97,20 @@ class PomodoroTimerActivity : AppCompatActivity() {
                 timeLeftInMillis = millisUntilFinished
                 updateTimerText()
             }
+
             override fun onFinish() {
                 timerRunning = false
                 binding.btnStart.text = "Start"
                 binding.tvTimer.text = "Finished!"
+
+                // -------------------- DATABASE ACTION --------------------
+                if (reminderId != -1) {
+                    // delete the reminder after finishing Pomodoro
+                    db.deleteReminder(reminderId)
+                    Toast.makeText(this@PomodoroTimerActivity, "Reminder completed!", Toast.LENGTH_SHORT).show()
+                }
+                // ---------------------------------------------------------
+
                 resetColors()
             }
         }.start()
@@ -138,7 +152,6 @@ class PomodoroTimerActivity : AppCompatActivity() {
     }
 
     private fun resetColors() {
-        // Reset all colors to original
         binding.root.setBackgroundColor(android.graphics.Color.parseColor(sageGreen))
         binding.btnStart.setBackgroundColor(android.graphics.Color.parseColor(buttonOriginal))
         binding.btnReset.setBackgroundColor(android.graphics.Color.parseColor(buttonOriginal))
