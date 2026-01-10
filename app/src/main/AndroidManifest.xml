@@ -19,7 +19,6 @@
         </activity>
 
         <activity android:name=".SearchForReminderActivity" android:exported="false"/>
-
         <activity android:name=".SetDateAndTimeActivity" android:exported="false"/>
         <activity android:name=".AddNoteActivity" android:exported="false"/>
         <activity android:name=".PomodoroTimerActivity" android:exported="false"/>

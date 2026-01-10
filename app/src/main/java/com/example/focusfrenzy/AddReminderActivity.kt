@@ -43,7 +43,6 @@ class AddReminderActivity : AppCompatActivity() {
         binding.btnSearch.setOnClickListener {
             startActivity(Intent(this, SearchForReminderActivity::class.java))
         }
-
         binding.btnAddActivity.setOnClickListener {
             reminderLauncher.launch(Intent(this, SetDateAndTimeActivity::class.java))
         }
