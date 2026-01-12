@@ -7,14 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class SQLiteManager extends SQLiteOpenHelper {
-    private static SQLiteManager sqLiteManager;
-    private static final String DATABASE_NAME = "focusfrenzy_database.db";
-    private static final int DATABASE_VERSION = 1;
-    private static final String TABLE_NAME = "reminders";
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_TITLE = "title";
-    private static final String COLUMN_DATE = "date";
-    private static final String COLUMN_POMODORO = "usePomodoro";
+    private static SQLiteManager sqLiteManager; //the Database
+    private static final String DATABASE_NAME = "focusfrenzy_database.db"; //database name
+    private static final int DATABASE_VERSION = 2; //the version of the Database
+    private static final String TABLE_NAME = "reminders"; //table name
+    private static final String COLUMN_ID = "id"; //column name
+    private static final String COLUMN_TITLE = "title";  //column title
+    private static final String COLUMN_DATE = "date"; //column date
+    private static final String COLUMN_POMODORO = "usePomodoro"; //data from pomodoro timer
+    private static final String COLUMN_COMPLETED = "isCompleted"; //checks if the reminder is complete
 
     public static SQLiteManager getInstance(Context context) {
         if (sqLiteManager == null) {
@@ -33,7 +34,8 @@ public class SQLiteManager extends SQLiteOpenHelper {
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_TITLE + " TEXT, " +
                 COLUMN_DATE + " TEXT, " +
-                COLUMN_POMODORO + " INTEGER);";
+                COLUMN_POMODORO + " INTEGER, " +
+                COLUMN_COMPLETED + " INTEGER DEFAULT 0);"; // checks if the reminder is completed
         db.execSQL(createTable);
     }
 
@@ -66,16 +68,29 @@ public class SQLiteManager extends SQLiteOpenHelper {
         db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
 
+    // This is the updated version that only shows active tasks
     public Cursor getAllReminders() {
-        return getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, COLUMN_ID + " DESC");
+        return getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_COMPLETED + " = 0 ORDER BY " + COLUMN_ID + " DESC", null);
     }
+
     public Cursor searchReminders(String query) {
         SQLiteDatabase db = this.getReadableDatabase();
         // The % signs are wildcards, so it finds the text anywhere in the title
         return db.query(TABLE_NAME,
                 null,
-                COLUMN_TITLE + " LIKE ?",
+                COLUMN_TITLE + " LIKE ? AND " + COLUMN_COMPLETED + " = 0",
                 new String[]{"%" + query + "%"},
                 null, null, COLUMN_ID + " DESC");
+    }
+
+    public void markAsComplete(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_COMPLETED, 1);
+        db.update(TABLE_NAME, values, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+    public Cursor getCompletedReminders() {
+        return getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_COMPLETED + " = 1 ORDER BY " + COLUMN_ID + " DESC", null);
     }
 }
