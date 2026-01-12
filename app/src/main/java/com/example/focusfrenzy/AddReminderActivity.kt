@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -61,13 +62,19 @@ class AddReminderActivity : AppCompatActivity() {
         checkNotificationPermission()
         checkExactAlarmPermission()
 
-        binding.btnHistory.setOnClickListener {
-            val intent = Intent(this, OldReminders::class.java)
-            startActivity(intent)
+        // THE BUTTON TRIO - DO NOT LOSE THESE
+        binding.btnSearch.setOnClickListener {
+            startActivity(Intent(this, SearchForReminderActivity::class.java))
         }
+
+        binding.btnHistory.setOnClickListener {
+            startActivity(Intent(this, OldReminders::class.java))
+        }
+
         binding.btnAddActivity.setOnClickListener {
             reminderLauncher.launch(Intent(this, SetDateAndTimeActivity::class.java))
         }
+
         loadRemindersFromDB()
     }
 
@@ -146,7 +153,7 @@ class AddReminderActivity : AppCompatActivity() {
 
     private fun loadRemindersFromDB() {
         binding.reminderContainer.removeAllViews()
-        val cursor = db.getAllReminders()
+        val cursor = db.allReminders // Corrected for Java method naming
         if (cursor.moveToFirst()) {
             do {
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
@@ -164,15 +171,18 @@ class AddReminderActivity : AppCompatActivity() {
     private fun addReminderToUI(id: Int, note: String, dateTime: String, usePomodoro: Boolean) {
         val existing = binding.reminderContainer.findViewWithTag<LinearLayout>(id)
         if (existing != null) {
-            (existing.getChildAt(0) as TextView).text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
+            // Index 1 because Checkbox is now at Index 0
+            (existing.getChildAt(1) as TextView).text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
             return
         }
 
         val layout = LinearLayout(this).apply {
             tag = id
-            orientation = LinearLayout.VERTICAL
+            orientation = LinearLayout.HORIZONTAL
             setPadding(24, 24, 24, 24)
             setBackgroundResource(R.drawable.reminder_background)
+            gravity = android.view.Gravity.CENTER_VERTICAL
+
             setOnClickListener {
                 if (usePomodoro) {
                     val intent = Intent(this@AddReminderActivity, PomodoroTimerActivity::class.java)
@@ -203,12 +213,28 @@ class AddReminderActivity : AppCompatActivity() {
             }
         }
 
+
         val tv = TextView(this).apply {
             text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
             textSize = 16f
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             setTextColor(resources.getColor(R.color.black))
         }
+        // CHECKBOX FOR USE CASE #8
+        val cb = CheckBox(this).apply {
+            setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    cancelAlarm(note, dateTime)
+                    db.markAsComplete(id)
+                    binding.reminderContainer.removeView(layout)
+                    updateEmptyState()
+                    Toast.makeText(this@AddReminderActivity, "Task finished! Moved to History", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         layout.addView(tv)
+        layout.addView(cb)
         binding.reminderContainer.addView(layout, 0)
     }
 

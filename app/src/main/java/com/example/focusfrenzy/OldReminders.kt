@@ -18,6 +18,30 @@ class OldReminders : AppCompatActivity() {
 
         db = SQLiteManager.getInstance(this)
         loadCompletedReminders()
+
+        //Delete Button Logic
+        binding.btnClearHistory.setOnClickListener {
+            // pops up when you try to delete nothing in the history
+            if (binding.oldRemindersContainer.childCount == 0) {
+                android.widget.Toast.makeText(this, "Nothing to delete", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Delete History?")
+                .setMessage("This will permanently delete your completed tasks. Are you sure you want to delete?")
+                .setPositiveButton("Yes") { _, _ ->
+                    // This deletes the reminder in the SQLite DB
+                    db.deleteAllCompletedReminders()
+
+                    // This deletes the reminder from the UI
+                    binding.oldRemindersContainer.removeAllViews()
+
+                    android.widget.Toast.makeText(this, "History Cleared!", android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("No", null)
+                .show()
+        }
     }
 
     private fun loadCompletedReminders() {

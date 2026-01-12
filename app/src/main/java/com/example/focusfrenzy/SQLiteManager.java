@@ -45,6 +45,13 @@ public class SQLiteManager extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void deleteAllCompletedReminders() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // This only deletes the ones where isCompleted is 1
+        db.delete(TABLE_NAME, COLUMN_COMPLETED + "=?", new String[]{"1"});
+        db.close();
+    }
+
     public long addReminder(String title, String date, boolean usePomodoro) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
