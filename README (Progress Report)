@@ -66,11 +66,11 @@ CHECKPOINT 5 (01/12/26)
 - Search button for reminders
 - Changed the time format from 24H to 12H
 - App will now notify user when a reminder is reached
+- Settings menu is now developed, will add more features soon
 
 Bugs:
 - Textbox for reminder in pomodoro screen wont follow color change with timer
 
 Pending:
-- Settings menu
 - Alarm Audio
 - Arduino Development
