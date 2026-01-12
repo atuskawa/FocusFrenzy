@@ -15,6 +15,7 @@
         android:text="FocusFrenzy"
         android:textSize="30sp"
         android:textStyle="bold"
+        android:textColor="#3E2723"
         android:layout_marginTop="16dp"
         android:gravity="center"
         tools:ignore="HardcodedText"
@@ -32,19 +33,21 @@
         app:tint="#000000"
         app:layout_constraintTop_toTopOf="@id/tvTitle"
         app:layout_constraintBottom_toBottomOf="@id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText"/>
 
     <ImageButton
         android:id="@+id/btnSearch"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_menu_search"
+        android:src="@drawable/ic_search"
         android:contentDescription="Search For Reminders"
         app:tint="#000000"
         app:layout_constraintTop_toTopOf="@id/tvTitle"
         app:layout_constraintBottom_toBottomOf="@id/tvTitle"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="HardcodedText" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -66,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="No reminders added"
-                android:textColor="#5D4037"
+                android:textColor="#3E2723"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_marginTop="20dp"
@@ -83,14 +86,28 @@
 
     <Button
         android:id="@+id/btnAddActivity"
-        android:layout_width="274dp"
+        android:layout_width="0dp"
         android:layout_height="54dp"
+        android:layout_marginEnd="8dp"
         android:backgroundTint="#95C6A9"
         android:text="+ Add an Activity"
         android:textColor="#5D4037"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnConnectThing"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/btnConnectThing"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:backgroundTint="#95C6A9"
+        android:text="+ Connect to Thing"
+        android:textColor="#5D4037"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnAddActivity"
         tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

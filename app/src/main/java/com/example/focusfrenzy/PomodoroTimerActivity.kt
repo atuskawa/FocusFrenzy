@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
+import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.focusfrenzy.databinding.ActivityPomodoroTimerBinding
@@ -35,6 +36,14 @@ class PomodoroTimerActivity : AppCompatActivity() {
         reminderId = intent.getIntExtra("reminderId", -1)
         binding.tvReminder.text = intent.getStringExtra("note") ?: "Focus Session"
 
+        // Fetches the settings you saved in SettingsActivity
+        val sharedPref = getSharedPreferences("FocusFrenzyPrefs", Context.MODE_PRIVATE)
+        val focusDurationMinutes = sharedPref.getInt("focus_duration", 25)
+
+        // Updates the Variables of the timer
+        workTime = focusDurationMinutes * 60 * 1000L
+        timeLeftInMillis = workTime
+
         updateTimerText()
 
         binding.btnStart.setOnClickListener {
@@ -45,12 +54,12 @@ class PomodoroTimerActivity : AppCompatActivity() {
             if (isBreakMode) startWorkManually() else startBreakManually()
         }
 
-        // Tap the timer to set custom minutes (1-60)
+        // Tap the timer to set custom minutes (1-60 minutes)
         binding.tvTimer.setOnClickListener {
             if (!timerRunning) {
                 showSetTimeDialog()
             } else {
-                Toast.makeText(this, "Pause the timer first, main character.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please pause the timer first", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -72,9 +81,9 @@ class PomodoroTimerActivity : AppCompatActivity() {
                         timeLeftInMillis = workTime
                         updateTimerText()
                     }
-                    Toast.makeText(this, "Focus set to $mins mins", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Timer set to $mins mins", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "1 to 60. It's not that deep.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "1 to 60.", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)

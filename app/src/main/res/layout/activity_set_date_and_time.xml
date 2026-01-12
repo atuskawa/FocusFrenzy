@@ -10,7 +10,7 @@
     android:background="#B3E4C7">
 
     <FrameLayout
-        android:layout_width="328dp"
+        android:layout_width="300dp"
         android:layout_height="405dp"
         android:background="@drawable/curved_container"
         android:clipToOutline="true"
@@ -19,7 +19,7 @@
 
         <DatePicker
             android:id="@+id/datePicker"
-            android:layout_width="328dp"
+            android:layout_width="300dp"
             android:layout_height="405dp"
             android:calendarViewShown="true" />
 
@@ -27,8 +27,8 @@
 
     <TimePicker
         android:id="@+id/timePicker"
-        android:layout_width="327dp"
-        android:layout_height="184dp"
+        android:layout_width="300dp"
+        android:layout_height="160dp"
         android:layout_margin="24dp"
         android:background="@drawable/curved_container"
         android:timePickerMode="spinner"
@@ -37,11 +37,12 @@
     <Button
         android:id="@+id/btnSetDateTime"
         android:layout_width="wrap_content"
-        android:layout_height="35dp"
+        android:layout_height="40dp"
         android:layout_marginTop="5dp"
         android:backgroundTint="#95C6A9"
         android:minHeight="48dp"
-        android:text="Set Date And Time"
+        android:text="Next"
+        android:textColor="#000000"
         tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
 </LinearLayout>

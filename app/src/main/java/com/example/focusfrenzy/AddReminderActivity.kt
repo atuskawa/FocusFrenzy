@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.widget.CheckBox
 import android.widget.LinearLayout
@@ -62,12 +61,15 @@ class AddReminderActivity : AppCompatActivity() {
         checkNotificationPermission()
         checkExactAlarmPermission()
 
-        //Shows 3 Buttons in the main screen
+        binding.btnConnectThing.setOnClickListener {
+            Toast.makeText(this, "Feature is Coming Soon", Toast.LENGTH_SHORT).show()
+        }
+
+        //Shows 3 Buttons in the main screen (excluding "Connect to Thing" since it is not developed yet)
         binding.btnSearch.setOnClickListener {
             startActivity(Intent(this, SearchForReminderActivity::class.java))
         }
 
-        // In AddReminderActivity.kt
         binding.btnMenu.setOnClickListener { view ->
             val popup = android.widget.PopupMenu(this, view)
             popup.menu.add("History")
@@ -80,7 +82,7 @@ class AddReminderActivity : AppCompatActivity() {
                         true
                     }
                     "Settings" -> {
-                        Toast.makeText(this, "Settings coming in the next update.", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, SettingsActivity::class.java))
                         true
                     }
                     else -> false
@@ -111,8 +113,8 @@ class AddReminderActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setTitle("Permission Needed")
                     .setMessage("I need 'Exact Alarm' permission to yell at you on time. Go to settings?")
-                    .setPositiveButton("Fine") { _, _ ->
-                        startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                    .setPositiveButton("Sure") { _, _ ->
+                        startActivity(Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
                     }
                     .setNegativeButton("No", null)
                     .show()

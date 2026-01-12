@@ -30,6 +30,8 @@
         <activity android:name=".PomodoroTimerActivity" android:exported="false"/>
         <activity android:name=".OldReminders" android:exported="false"/>
         <receiver android:name=".ReceiveReminder" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false"/>
+
 
     </application>
 </manifest>
