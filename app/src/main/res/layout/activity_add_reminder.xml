@@ -27,7 +27,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_menu"
+        android:src="@drawable/ic_menu"
         android:contentDescription="View Completed Tasks"
         app:tint="#000000"
         app:layout_constraintTop_toTopOf="@id/tvTitle"
