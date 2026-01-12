@@ -62,13 +62,31 @@ class AddReminderActivity : AppCompatActivity() {
         checkNotificationPermission()
         checkExactAlarmPermission()
 
-        // THE BUTTON TRIO - DO NOT LOSE THESE
+        //Shows 3 Buttons in the main screen
         binding.btnSearch.setOnClickListener {
             startActivity(Intent(this, SearchForReminderActivity::class.java))
         }
 
-        binding.btnHistory.setOnClickListener {
-            startActivity(Intent(this, OldReminders::class.java))
+        // In AddReminderActivity.kt
+        binding.btnMenu.setOnClickListener { view ->
+            val popup = android.widget.PopupMenu(this, view)
+            popup.menu.add("History")
+            popup.menu.add("Settings") //To be used for Case 10 (Customize pomodoro settings)
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.title) {
+                    "History" -> {
+                        startActivity(Intent(this, OldReminders::class.java))
+                        true
+                    }
+                    "Settings" -> {
+                        Toast.makeText(this, "Settings coming in the next update.", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
 
         binding.btnAddActivity.setOnClickListener {
