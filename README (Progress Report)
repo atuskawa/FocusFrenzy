@@ -25,6 +25,7 @@ Pending:
 Bugs:
 - When you close (destroy) the app, all the reminders are deleted 
 
+---------------------------------------------------------------------------
 
 CHECKPOINT 3 PROGRESS (12/11/25)
 - Added text on home screen that says no reminders when there's no reminders
@@ -42,6 +43,8 @@ Pending:
 - Alarm Audio when timer is finished
 - Further Improve Reminder Format
 
+---------------------------------------------------------------------------
+
 CHECKPOINT 4 PROGRESS (01/09/26)
 -Developed the SQLiteManager database
 
@@ -56,3 +59,18 @@ Pending:
 - Alarm Audio when timer is finished
 - Further Improve Reminder Format
 
+---------------------------------------------------------------------------
+
+CHECKPOINT 5 (01/12/26)
+- History log for reminders
+- Search button for reminders
+- Changed the time format from 24H to 12H
+- App will now notify user when a reminder is reached
+
+Bugs:
+- Textbox for reminder in pomodoro screen wont follow color change with timer
+
+Pending:
+- Settings menu
+- Alarm Audio
+- Arduino Development
