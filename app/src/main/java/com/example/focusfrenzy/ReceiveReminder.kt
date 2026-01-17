@@ -10,28 +10,25 @@ import androidx.core.app.NotificationCompat
 
 class ReceiveReminder : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val title = intent.getStringExtra("title") ?: "Focus Session"
-        val channelId = "focus_frenzy_alerts"
+        val note = intent.getStringExtra("note_content") ?: "Task Reminder!"
+        val taskId = intent.getIntExtra("id", 0)
 
-        // uses system service for context
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "focus_frenzy_channel"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId, "Task Alerts",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
+            val channel = NotificationChannel(channelId, "Reminders", NotificationManager.IMPORTANCE_HIGH)
+            manager.createNotificationChannel(channel)
         }
 
-        // Make sure you're using NotificationCompat from the androidx library
-        val builder = NotificationCompat.Builder(context, channelId)
+        val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Hey! Time to Focus!")
-            .setContentText("Time to focus on: $title")
+            .setContentTitle("Focus Frenzy")
+            .setContentText(note)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-        notificationManager.notify(1001, builder.build())
+            .build()
+
+        manager.notify(taskId, notification)
     }
 }

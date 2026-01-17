@@ -23,11 +23,13 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.sbFocus.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val valToSave = if (progress < 1) 1 else progress // Disables 0 Minutes
-                binding.tvFocusVal.text = "$valToSave min"
+                val actualProgress = if (progress < 1) 1 else progress
+                if (progress < 1) {
+                    seekBar?.progress = 1
+                }
 
-                // Save to storage
-                sharedPref.edit().putInt("focus_duration", valToSave).apply()
+                binding.tvFocusVal.text = "$actualProgress min"
+                sharedPref.edit().putInt("focus_duration", actualProgress).apply()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -35,9 +37,8 @@ class SettingsActivity : AppCompatActivity() {
         })
 
         binding.btnBack.setOnClickListener {
-            val focusTime = binding.sbFocus.progress
-            sharedPref.edit().putInt("focus_duration", focusTime).apply()
-            finish() // Returns to AddReminder Screen
+            val finalValue = sharedPref.getInt("focus_duration", 25)
+            finish()
         }
     }
 }
