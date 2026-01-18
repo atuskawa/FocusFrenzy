@@ -5,7 +5,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -16,7 +15,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.focusfrenzy.databinding.ActivityAddReminderBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -24,6 +22,10 @@ import java.util.Locale
 class AddReminderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddReminderBinding
     private lateinit var db: SQLiteManager
+
+    // Formatters: input handles your DB string, output handles the UI "Vibe"
+    private val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    private val outputFormat = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
 
     private val reminderLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -41,7 +43,6 @@ class AddReminderActivity : AppCompatActivity() {
             } else {
                 db.updateReminder(id, note, dateTime, usePomodoro)
                 addReminderToUI(id, note, dateTime, usePomodoro)
-                // Kill old one and set new one if enabled
                 cancelAlarm(id)
                 if (shouldNotify) scheduleNotification(id, note, dateTime)
             }
@@ -63,10 +64,43 @@ class AddReminderActivity : AppCompatActivity() {
             Toast.makeText(this, "Feature coming soon 💀", Toast.LENGTH_SHORT).show()
         }
 
+        binding.btnSearch.setOnClickListener {
+            startActivity(Intent(this, SearchForReminderActivity::class.java))
+        }
+
+        binding.btnMenu.setOnClickListener { view ->
+            val popup = androidx.appcompat.widget.PopupMenu(this, view)
+            popup.menu.add("History")
+            popup.menu.add("Settings")
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.title) {
+                    "History" -> {
+                        startActivity(Intent(this, OldReminders::class.java))
+                        true
+                    }
+                    "Settings" -> {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
         loadRemindersFromDB()
     }
 
-    // This goes AFTER the onCreate method ends
+    // helper so it converts from 24H to 12H
+    private fun formatTime(dateTime: String): String {
+        return try {
+            val date = inputFormat.parse(dateTime)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            dateTime // If it's garbage, just show the garbage
+        }
+    }
+
     private fun scheduleNotification(taskId: Int, note: String, dateTime: String) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, ReceiveReminder::class.java).apply {
@@ -75,10 +109,9 @@ class AddReminderActivity : AppCompatActivity() {
         }
 
         try {
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            val timeInMillis = sdf.parse(dateTime)?.time ?: return
+            // Using 'mm' for double-digit minutes. No more 14:9 logic.
+            val timeInMillis = inputFormat.parse(dateTime)?.time ?: return
 
-            // If the time is in the past, don't even bother
             if (timeInMillis <= System.currentTimeMillis()) return
 
             val pendingIntent = PendingIntent.getBroadcast(
@@ -86,13 +119,13 @@ class AddReminderActivity : AppCompatActivity() {
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
 
-            // Security check for Android 12+ (API 31+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
                 } else {
-                    // Fallback to inexact if they haven't granted permission yet
+                    // Inexact fallback so the app doesn't ghost the user
                     alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
+                    Toast.makeText(this, "Notification might be late (Permission missing).", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
@@ -102,81 +135,64 @@ class AddReminderActivity : AppCompatActivity() {
         }
     }
 
-    private fun scheduleSystemReminder(note: String, dateTime: String, taskId: Int) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-        val triggerTime: Long = try {
-            sdf.parse(dateTime)?.time ?: return
-        } catch (e: Exception) { return }
-
-        val intent = Intent(this, ReceiveReminder::class.java).apply {
-            putExtra("note_content", note)
-            putExtra("id", taskId)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this, taskId, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // THE FIX: Check if we have permission for EXACT alarms
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-            } else {
-                // They didn't give you permission, so we have to use a "flexible" alarm
-                // OR take them to settings. Let's do a flexible one so it doesn't crash.
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-                Toast.makeText(this, "Permission missing: Reminder might be slightly late.", Toast.LENGTH_SHORT).show()
-
-                // Optional: Send them to settings to fix it
-                // startActivity(Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
-            }
-        } else {
-            // Old phones don't care about your privacy/battery
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-        }
-    }
-
     private fun cancelAlarm(taskId: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, ReceiveReminder::class.java).apply {
-            putExtra("id", taskId) // Match intent filter exactly
+            putExtra("id", taskId)
         }
-
         val pendingIntent = PendingIntent.getBroadcast(
             this, taskId, intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
     }
 
     @SuppressLint("SetTextI18n")
     private fun addReminderToUI(id: Int, note: String, dateTime: String, usePomodoro: Boolean) {
+        val prettyTime = formatTime(dateTime)
+        val displayText = "$prettyTime\n$note ${if (usePomodoro) "🕛" else ""}"
+
         val existing = binding.reminderContainer.findViewWithTag<LinearLayout>(id)
 
         if (existing != null) {
-            // FIX: Index 0 is the TextView. Index 1 is the Checkbox.
-            val tv = existing.getChildAt(0) as? TextView
-            tv?.text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
+            (existing.getChildAt(0) as? TextView)?.text = displayText
             return
         }
 
         val layout = LinearLayout(this).apply {
             tag = id
             orientation = LinearLayout.HORIZONTAL
-            setPadding(24, 24, 24, 24)
+            setPadding(32, 32, 32, 32)
             setBackgroundResource(R.drawable.reminder_background)
             gravity = android.view.Gravity.CENTER_VERTICAL
+
+            // gives each reminder a space so they don't stick together
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(0, 0, 0, 8) // This adds 16dp of space at the bottom of each item
+            layoutParams = params
 
             isClickable = true
             isFocusable = true
 
+            setOnClickListener {
+                if (usePomodoro) {
+                    val intent = Intent(this@AddReminderActivity, PomodoroTimerActivity::class.java).apply {
+                        putExtra("note", note)
+                        putExtra("id", id)
+                    }
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(context, "No timer enabled for this reminder", Toast.LENGTH_SHORT).show()
+                }
+            }
+
             setOnLongClickListener {
-                AlertDialog.Builder(context).setItems(arrayOf("Edit", "Delete")) { _, which ->
-                    if (which == 0) { //Flow is Set Date and Time, then Add Note.
+                AlertDialog.Builder(context).setItems(arrayOf("Edit Reminder", "Delete")) { _, which ->
+                    if (which == 0) {
                         val intent = Intent(this@AddReminderActivity, SetDateAndTimeActivity::class.java).apply {
                             putExtra("id", id); putExtra("note", note); putExtra("datetime", dateTime); putExtra("usePomodoro", usePomodoro)
                         }
@@ -193,7 +209,7 @@ class AddReminderActivity : AppCompatActivity() {
         }
 
         val tv = TextView(this).apply {
-            text = "$dateTime\n$note ${if (usePomodoro) "🕛" else ""}"
+            text = displayText
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         }
 
@@ -202,6 +218,7 @@ class AddReminderActivity : AppCompatActivity() {
                 if (isChecked) {
                     cancelAlarm(id)
                     db.markAsComplete(id)
+                    Toast.makeText(this@AddReminderActivity, "Task complete! Moved to History", Toast.LENGTH_SHORT).show()
                     binding.reminderContainer.removeView(layout)
                     updateEmptyState()
                 }

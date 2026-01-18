@@ -64,12 +64,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:padding="16dp"
         android:background="#95C6A9"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Your reminder will appear here"
         android:textColor="#000000"
         android:textSize="18sp"
-        android:text="Your reminder will appear here"
-        android:gravity="center"
-        tools:ignore="HardcodedText"/>
+        tools:ignore="HardcodedText" />
 
 </LinearLayout>

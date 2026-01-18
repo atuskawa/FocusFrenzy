@@ -28,6 +28,7 @@ class SearchForReminderActivity : AppCompatActivity() {
                 val query = s.toString().trim()
                 performSearch(query)
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -56,16 +57,32 @@ class SearchForReminderActivity : AppCompatActivity() {
     }
 
     private fun addResultToUI(note: String, date: String) {
+        // Changes the Date format from 24H to 12H"
+        val prettyDate = try {
+            val inputFormat =
+                java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
+            val outputFormat =
+                java.text.SimpleDateFormat("MMM dd, hh:mm a", java.util.Locale.getDefault())
+            val parsedDate = inputFormat.parse(date)
+            outputFormat.format(parsedDate!!)
+        } catch (e: Exception) {
+            date // Fallback if your database string is weird
+        }
+
         val tv = TextView(this).apply {
-            text = "$date\n$note"
+            text = "$prettyDate\n$note"
             textSize = 16f
-            setPadding(30, 30, 30, 30)
-            setTextColor(resources.getColor(R.color.black))
+            setPadding(40, 40, 40, 40)
+            setTextColor(resources.getColor(R.color.black, null))
             setBackgroundResource(R.drawable.reminder_background)
+
+            // Keeping that personal space we talked about
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(0, 0, 0, 20) }
+            ).apply {
+                setMargins(0, 0, 0, 24)
+            }
         }
         binding.searchResultContainer.addView(tv)
     }
